@@ -1,6 +1,4 @@
-import {PrismaClient} from '@prisma/client'
-
-const prisma = new PrismaClient();
+import { prisma } from './lib/prisma'
 
 function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -94,16 +92,16 @@ try {
             createdAt: new Date('2025-03-22'),
         },        
     ]
-    console.log('✅ Database seeding completed successfully!\n');
+
     for (const review of reviews) {
-        review.comment = capitalizeFirstLetter(review.comment);
+        // review.comment = capitalizeFirstLetter(review.comment);
         review.rating = getRandomRating();
         await prisma.review.create({
             data: review
         })
     }
 
-    console.log('Database seeded successfully');
+    console.log('✅ Database seeding completed successfully!\n');
 }catch(error) {
     console.error('Error seeding the database:', error);
     await prisma.$disconnect();
