@@ -1,98 +1,100 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://nestjs.com/img/logo-small.svg" width="96" alt="NestJS logo" />
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# WeRent Backend
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Lightweight NestJS + Prisma service that powers the WeRent product reviews experience.  
+It exposes a simple HTTP API (soon to be expanded) backed by PostgreSQL and provides scripts to manage schema migrations, seed curated sample data, and run automated tests.
 
-## Description
+## Tech Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- NestJS 11 with Express adapter
+- Prisma 7 + PostgreSQL via `@prisma/adapter-pg`
+- pnpm for dependency management
+- Jest + Supertest for automated testing
 
-## Project setup
+## Prerequisites
 
-```bash
-$ pnpm install
+- Node.js ≥ 20
+- pnpm ≥ 9 (`corepack enable` is recommended)
+- A PostgreSQL database (local Docker container or managed instance)
+
+## Configuration
+
+Create a `.env` file in the project root that defines at least the connection string used by Prisma:
+
+```
+DATABASE_URL="postgresql://user:password@localhost:5432/werent?schema=public"
 ```
 
-## Compile and run the project
+The Prisma client is configured in `prisma/lib/prisma.ts` and automatically picks up this value.
+
+## Getting Started
 
 ```bash
-# development
-$ pnpm run start
+# install dependencies
+pnpm install
 
-# watch mode
-$ pnpm run start:dev
+# generate Prisma client (if you change the schema)
+pnpm exec prisma generate
 
-# production mode
-$ pnpm run start:prod
+# apply database migrations
+pnpm exec prisma migrate deploy
+
+# run the API
+pnpm start:dev
 ```
 
-## Run tests
+The service boots on `http://localhost:3000`. The default `GET /` route returns a simple health message so you can verify the server is running.
+
+## Database Tasks
 
 ```bash
-# unit tests
-$ pnpm run test
+# create a new migration
+pnpm exec prisma migrate dev --name <migration_name>
 
-# e2e tests
-$ pnpm run test:e2e
+# push schema changes without generating SQL (prototype mode)
+pnpm exec prisma db push
 
-# test coverage
-$ pnpm run test:cov
+# populate the Review table with sample entries
+pnpm run db:seed
 ```
 
-## Deployment
+Review records live in `prisma/schema.prisma` and are used to showcase average size/fit data inside the WeRent UI.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## NPM Scripts
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+pnpm start          # production build (needs dist/)
+pnpm start:dev      # watch mode with ts-node
+pnpm start:prod     # run compiled dist
+pnpm test           # unit tests
+pnpm test:e2e       # e2e tests in ./test
+pnpm test:cov       # coverage report
+pnpm lint           # eslint with --fix
+pnpm format         # prettier on src/ and test/
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Project Structure
 
-## Resources
+- `src/` – NestJS modules, controllers, and services. The `prisma` module manages the shared Prisma client lifecycle.
+- `prisma/` – Prisma schema, migrations, and the seeding script.
+- `generated/` – Type-safe Prisma client output (committed for CI reproducibility).
+- `test/` – Jest e2e setup (`supertest` against the compiled app).
 
-Check out a few resources that may come in handy when working with NestJS:
+## Testing
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+1. Ensure the database described by `DATABASE_URL` is reachable.
+2. Run `pnpm test` for unit tests or `pnpm test:e2e` for end-to-end specs.
+3. View coverage details with `pnpm test:cov`.
 
-## Support
+## Deployment Notes
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Use `pnpm build` to emit TypeScript into `dist/`.
+- Provide the same environment variables (`DATABASE_URL`, etc.) in your hosting platform.
+- Run `pnpm start:prod` (or `node dist/main`) behind a process manager such as PM2 or a container orchestrator.
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This repository is currently distributed under the terms defined in `LICENSE`.
