@@ -1,0 +1,482 @@
+{
+  "info": {
+    "name": "Werent Review API",
+    "description": "Complete API collection for Werent product review system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "werent-api"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('jwt_token', response.access_token);",
+                  "    console.log('JWT Token saved:', response.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"John Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user account"
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('jwt_token', response.access_token);",
+                  "    console.log('JWT Token saved:', response.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with email and password. Returns JWT token."
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Get current authenticated user profile"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/products?page=1&limit=10&search=&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page (default: 10, max: 100)"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by product name or description"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt",
+                  "description": "Sort by: createdAt, name, rating"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc",
+                  "description": "Sort order: asc or desc"
+                }
+              ]
+            },
+            "description": "Get all products with pagination, search, and sorting"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "1"]
+            },
+            "description": "Get detailed information about a specific product"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Premium Cotton Shirt",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "High-quality cotton shirt perfect for casual wear",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "299000",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"]
+            },
+            "description": "Create a new product with optional image upload (requires authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reviews Summary",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/products/1/reviews/summary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "1", "reviews", "summary"]
+            },
+            "description": "Get review summary including overall rating, total reviews, and fit distribution"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product Reviews",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/products/1/reviews?page=1&limit=10&rating=&fit=&hasMedia=&sortBy=createdAt",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "1", "reviews"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "rating",
+                  "value": "",
+                  "description": "Filter by rating (1-5)"
+                },
+                {
+                  "key": "fit",
+                  "value": "",
+                  "description": "Filter by fit type: SMALL, TRUE, LARGE"
+                },
+                {
+                  "key": "hasMedia",
+                  "value": "",
+                  "description": "Filter reviews with media: true or false"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt",
+                  "description": "Sort by: createdAt, rating, helpful"
+                }
+              ]
+            },
+            "description": "Get reviews for a product with filters and pagination"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review (Basic)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "rating",
+                  "value": "5",
+                  "type": "text",
+                  "description": "Rating 1-5 (required)"
+                },
+                {
+                  "key": "content",
+                  "value": "Great product! The quality is excellent and fits perfectly. Highly recommended!",
+                  "type": "text",
+                  "description": "Review content min 10 chars (required)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reviews/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reviews", "products", "1"]
+            },
+            "description": "Create a basic review with rating and content only"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Review (With Measurements)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "rating",
+                  "value": "5",
+                  "type": "text"
+                },
+                {
+                  "key": "content",
+                  "value": "Perfect fit! I'm very satisfied with this purchase.",
+                  "type": "text"
+                },
+                {
+                  "key": "waist",
+                  "value": "70",
+                  "type": "text",
+                  "description": "Waist measurement in cm (optional, 50-150)"
+                },
+                {
+                  "key": "bust",
+                  "value": "85",
+                  "type": "text",
+                  "description": "Bust measurement in cm (optional, 60-150)"
+                },
+                {
+                  "key": "hips",
+                  "value": "90",
+                  "type": "text",
+                  "description": "Hips measurement in cm (optional, 60-160)"
+                },
+                {
+                  "key": "fit",
+                  "value": "TRUE",
+                  "type": "text",
+                  "description": "Fit type: SMALL, TRUE, or LARGE (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reviews/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reviews", "products", "1"]
+            },
+            "description": "Create a review with body measurements and fit information"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Review (With Media)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "rating",
+                  "value": "5",
+                  "type": "text"
+                },
+                {
+                  "key": "content",
+                  "value": "Amazing product! Check out the photos and video.",
+                  "type": "text"
+                },
+                {
+                  "key": "media",
+                  "type": "file",
+                  "src": [],
+                  "description": "Image file (max 5MB)"
+                },
+                {
+                  "key": "media",
+                  "type": "file",
+                  "src": [],
+                  "description": "Another image (max 5 files total)"
+                },
+                {
+                  "key": "waist",
+                  "value": "75",
+                  "type": "text"
+                },
+                {
+                  "key": "bust",
+                  "value": "90",
+                  "type": "text"
+                },
+                {
+                  "key": "hips",
+                  "value": "95",
+                  "type": "text"
+                },
+                {
+                  "key": "fit",
+                  "value": "TRUE",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reviews/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reviews", "products", "1"]
+            },
+            "description": "Create a review with images/videos (max 5 files, 5MB for images, 50MB for videos)"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Review as Helpful",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reviews/1/helpful",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reviews", "1", "helpful"]
+            },
+            "description": "Mark a review as helpful (requires authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Helpful Mark",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reviews/1/helpful",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reviews", "1", "helpful"]
+            },
+            "description": "Remove helpful mark from a review (requires authentication)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://werent-be.vercel.app",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
