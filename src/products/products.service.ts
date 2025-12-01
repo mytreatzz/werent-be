@@ -33,7 +33,7 @@ export class ProductsService {
   async findAll(queryDto: QueryProductsDto) {
     const page = queryDto.page ?? 1;
     const limit = queryDto.limit ?? 10;
-    const { search } = queryDto;
+    const { search, sortBy = 'createdAt', sortOrder = 'desc' } = queryDto;
     const skip = (page - 1) * limit;
 
     // Build where clause
@@ -46,13 +46,16 @@ export class ProductsService {
       };
     }
 
+    // Build orderBy clause
+    const orderBy: any = { [sortBy]: sortOrder };
+
     // Fetch products with pagination
     const [products, totalCount] = await Promise.all([
       this.prisma.product.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
       }),
       this.prisma.product.count({ where }),
     ]);
